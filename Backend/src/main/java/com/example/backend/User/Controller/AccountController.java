@@ -1,8 +1,10 @@
-package com.example.backend.Controller;
+package com.example.backend.User.Controller;
 
-import com.example.backend.Entity.Dto.Account.SignupDto;
-import com.example.backend.Entity.User;
-import com.example.backend.Service.AccountService;
+import com.example.backend.User.Entity.Dto.LoginDto;
+import com.example.backend.User.Entity.Dto.ResponseDto;
+import com.example.backend.User.Entity.Dto.SignupDto;
+import com.example.backend.User.Entity.User;
+import com.example.backend.User.Service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +16,10 @@ public class AccountController {
 
 
     //로그인
+    @PostMapping("/login")
+    public ResponseDto login(@RequestBody LoginDto loginDto){
+        return accountService.login(loginDto);
+    }
 
     //회원가입
     @PostMapping("/signup")
@@ -26,4 +32,5 @@ public class AccountController {
     public boolean exist_Id(@PathVariable String Id){
         return accountService.exist_id(Id);
     }
+
 }

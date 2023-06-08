@@ -1,4 +1,4 @@
-package com.example.backend.Entity.Enum;
+package com.example.backend.User.Entity.Enum;
 
 public enum Role {
     USER, MANAGER, ADMIN;

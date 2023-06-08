@@ -1,7 +1,7 @@
-package com.example.backend.Entity.Dto.Account;
+package com.example.backend.User.Entity.Dto;
 
-import com.example.backend.Entity.Enum.Role;
-import com.example.backend.Entity.User;
+import com.example.backend.User.Entity.Enum.Role;
+import com.example.backend.User.Entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
