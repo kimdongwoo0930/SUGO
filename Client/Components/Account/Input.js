@@ -8,16 +8,40 @@ import {
 } from "react-native";
 import { useEffect, useState } from "react";
 
+import { formatTime, handleStartTimer } from "../../Utills/Timer";
+
 export default Input = ({
   Title,
   Hint,
   State,
   SetState,
-  CheckState,
+  Message,
   SendMail,
 }) => {
   const [ios, setIos] = useState();
   const [timer, setTimer] = useState();
+
+  // 타이머 state
+  const duration = 180; // 타이머 기간(초)
+  const [timeLeft, setTimeLeft] = useState(duration);
+  const [timerRunning, setTimerRunning] = useState(false);
+
+  useEffect(() => {
+    let timer;
+    if (timerRunning) {
+      timer = setInterval(() => {
+        setTimeLeft((prevTime) => prevTime - 1);
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [timerRunning]);
+
+  useEffect(() => {
+    if (SendMail) handleStartTimer(setTimerRunning);
+  }, [SendMail]);
 
   useEffect(() => {
     Platform.OS === "ios" ? setIos(true) : setIos(false);
@@ -73,11 +97,7 @@ export default Input = ({
           />
         </View>
         {/* <Text style={{ color : "#6B83AF", fontWeight : "bold" , textAlign : "right", bottom : 4}}>SUGO</Text> */}
-        {CheckState ? (
-          <Text style={[styles.failMsg]}>다시해 다시해~</Text>
-        ) : (
-          <></>
-        )}
+        <Text style={[styles.failMsg]}>{Message}</Text>
       </View>
     );
   } else if (Title === "학과") {
@@ -146,9 +166,11 @@ export default Input = ({
           <Text style={styles.InputTitle}>{Title}</Text>
           <TextInput
             style={styles.textInput}
-            editable={SendMail}
+            editable={!SendMail}
             value={State}
             onChange={(event) => SetState(event.nativeEvent.text)}
+            placeholder={"Example@suwon.ac.kr"}
+            placeholderTextColor="#B6B9C0"
           />
         </View>
         {/* <Text style={{ color : "#6B83AF", fontWeight : "bold" , textAlign : "right", bottom : 6, }}>SUGO</Text> */}
@@ -178,16 +200,12 @@ export default Input = ({
                   textAlign: "right",
                 }}
               >
-                03:00
+                {formatTime(timeLeft)}
               </Text>
             </View>
           </View>
         )}
-        {CheckState ? (
-          <Text style={styles.failMsg}>다시해 다시해~</Text>
-        ) : (
-          <></>
-        )}
+        <Text style={[styles.failMsg]}>{Message}</Text>
       </View>
     );
   } else {
@@ -199,17 +217,14 @@ export default Input = ({
             style={styles.textInput}
             value={State}
             onChange={(event) => SetState(event.nativeEvent.text)}
+            secureTextEntry={true}
           />
         </View>
         {/* <Text style={{ color : "#6B83AF", fontWeight : "bold" , textAlign : "right", bottom : 6, }}>SUGO</Text> */}
         <View style={{ width: "100%", top: 5, top: "40%" }}>
           <Text style={styles.HintMsg}>{Hint}</Text>
         </View>
-        {CheckState ? (
-          <Text style={[styles.failMsg, { top: "36%" }]}>다시해 다시해~</Text>
-        ) : (
-          <></>
-        )}
+        <Text style={[styles.failMsg]}>{Message}</Text>
       </View>
     );
   }

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,6 +9,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default Login = ({ navigation }) => {
+  const [message, setMessage] = useState("");
+
   return (
     <SafeAreaView style={{ backgroundColor: "#FFDE89" }}>
       <View style={styles.container}>
@@ -27,6 +30,9 @@ export default Login = ({ navigation }) => {
             <View style={styles.InputView}>
               <Text style={styles.LoginText}>비밀번호</Text>
               <TextInput style={styles.LoginInput} secureTextEntry={true} />
+            </View>
+            <View style={{ width: "100%" }}>
+              <Text style={{ textAlign: "center" }}>d</Text>
             </View>
           </View>
         </View>
