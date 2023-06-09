@@ -1,5 +1,6 @@
 package com.example.backend.User.Service;
 
+import com.example.backend.User.Config.RedisUtil;
 import com.example.backend.User.Entity.Dto.ResponseDto;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
@@ -14,23 +15,46 @@ import java.util.Random;
 
 import jakarta.mail.internet.MimeMessage;
 
-
 @Service
 public class MailService {
     @Autowired
     JavaMailSender javaMailSender;
 
+    @Autowired
+    RedisUtil redisUtil;
+
+
 
     // 키 생성
-    public static final String ePw = createKey();
+    private String ePw;
+
+
+    public void setEPw(String key){
+        ePw = key;
+    }
+
+    public ResponseDto equalEPw(String email,String key){
+        if(redisUtil.existData(key)){
+            return new ResponseDto(false,"인증시간이 만료되었습니다.");
+        }
+        if(redisUtil.getData(email).equals(key)){
+            redisUtil.deleteData(email);
+            return new ResponseDto(true,"인증 완료");
+        }
+        return new ResponseDto(false,"올바르지 않은 인증번호입니다.");
+    }
+
+
 
     // 메일 내용 작성
 
     public MimeMessage createMessage(String to) throws MessagingException, UnsupportedEncodingException {
+        setEPw(createKey());
+
         MimeMessage message = javaMailSender.createMimeMessage();
 
         message.addRecipients(Message.RecipientType.TO, to);// 보내는 대상
-        message.setSubject("운동메 회원가입 이메일 인증");// 제목
+        message.setSubject("수고했어 수원대 학생 인증 코드");// 제목
 
         String msgg = "";
         msgg += "<div style='margin:100px;'>";
@@ -41,12 +65,10 @@ public class MailService {
         msgg += "</div>";
         message.setText(msgg, "utf-8", "html");// 내용, charset 타입, subtype
         // 보내는 사람의 이메일 주소, 보내는 사람 이름
-        message.setFrom(new InternetAddress("보낸는 주소", "보내는 사람 이름"));// 보내는 사람
+        message.setFrom(new InternetAddress("suwonSugo@naver.com", "수고했어"));// 보내는 사람
 
         return message;
     }
-
-
 
     // 랜덤 인증 코드 생성
     public static String createKey() {
@@ -83,11 +105,16 @@ public class MailService {
         // 랜덤 인증번호 생성
         MimeMessage message = createMessage(to); // 메일 발송
         try {// 예외처리
+            if(redisUtil.existData(to)){
+                redisUtil.deleteData(to);
+            }
             javaMailSender.send(message);
         } catch (MailException es) {
             es.printStackTrace();
             throw new IllegalArgumentException();
         }
+
+        redisUtil.setDataExpire(to,ePw,60*3L);
 
         return new ResponseDto(true,"이메일 전송됨");
     }
